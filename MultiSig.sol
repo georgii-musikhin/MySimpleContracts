@@ -95,11 +95,11 @@ contract MultiSigWallet {
     validOwner
     public{
         Transaction storage transaction = _transactions[transactionId];
-        //Транзакция должна существовать
+        //Is there this transaction?
         require(address(0x0) != transaction.from);
-        //Создатель транзакции не может её подписать
+        //Сreator of transaction can't sign it
         require(msg.sender != transaction.from);
-        //Подписывать можно только один раз
+        //You can sign only once
         require(transaction.signatures[msg.sender] != 1);
         
         transaction.signatures[msg.sender] = 1;

@@ -40,22 +40,23 @@ library SafeMath {
 contract MMM_Simple{
     using SafeMath for uint;
     
-    uint public MIN_DEPOSIT = 0.01 ether; //Минимальный депозит
-    uint public DIV_PER     = 3;          //Процент дивидендов
-    uint public ADM_FEE     = 8;          //Процент администрации
-    uint public REF_FEE     = 10;         //Процент реффу
-    uint public PERIOD      = 1 minutes;  //Двиденды начисляются каждую минуты(для простоты теста. а так в день)
+    uint public MIN_DEPOSIT = 0.01 ether; //Minimum deposit
+    uint public DIV_PER     = 3;          //Dividend percent
+    uint public ADM_FEE     = 8;          //Administrator percent
+    uint public REF_FEE     = 10;         //Refferal percent
+    uint public PERIOD      = 1 minutes;  //Dividends count every minute(
+                                          //to simplify tests)
     
-    struct  User {                         //Структура вкладчика
+    struct  User {                         //Participant structure
         uint deposits;
         uint timeOfDeposit;
         address payable reffer;
     }
     
-    mapping (address => User) users;       //Маппинг вкладчиков
+    mapping (address => User) users;       //Mapping of participants
     
-    address payable public administrator;  //Адрес администрации
-    uint timeOfLife;                       //Сколько времени пирамида работает в днях
+    address payable public administrator;  //Administrator address
+    uint timeOfLife;                       //How many time contract live
     
     event InvestorAdded(address indexed investor);
     event NewDeposit(address indexed investor, uint256 amount);
@@ -74,10 +75,8 @@ contract MMM_Simple{
         } else makeDeposit();
     }
     
-    //Функция, которая принимает деньги. Минимальный депозит 0.01 эфир.
-    //8% идёт администрации, 10% реферреру, если есть.
-    //Она создаёт нового участника пирамиды с свойствами: баланс его депозита, время депозита. 
-    //Так же функция добовляет нового участника в приамиду.
+    //Function for deposit and withdraw.
+
     function makeDeposit() public payable {
         require(msg.value >= MIN_DEPOSIT);
         
@@ -101,7 +100,7 @@ contract MMM_Simple{
         emit NewDeposit(msg.sender, msg.value);
     }
     
-    //Функция перевода из байтов в адрес
+    //Function to convert bytes to address
     function bytesToAddress(bytes memory _val) internal pure returns (address payable _addr){
         assembly {
             _addr := mload(add(_val,0x14))
@@ -109,7 +108,7 @@ contract MMM_Simple{
         return _addr;
     }
     
-    //Функция добавления реффера
+    //Function for refferal system
     function addReffer() internal {
         address payable refAddr = bytesToAddress(bytes(msg.data));
         if (msg.sender != refAddr){
@@ -121,14 +120,14 @@ contract MMM_Simple{
         }
     }
     
-    //Функция рассчёта дивидендов вкладчику и публичный геттер
+    //Count of dividends
     
     function getDividends (address _addr) public view returns (uint){
         return (users[_addr].deposits.mul(DIV_PER).div(100)).mul(now.sub(users[_addr].timeOfDeposit)).div(PERIOD);
     }
     
     
-    //Функия снятия денег. Для снятия нужно отправить 0 эфира. Снимаются деньги и обнуляется счётчик по времени депозита.
+    //Withdraw function. You should sent 0 ehter
     function withdraw(address payable _addr) private {
         uint dividens = getDividends(_addr);
         if (dividens > 0){
@@ -138,18 +137,16 @@ contract MMM_Simple{
         emit DividendsPayed(msg.sender, dividens);
     }
     
-    //Баланс депозита
+    
     function balanceOfDeposit() public view returns(uint){
         return users[msg.sender].deposits;
     }
     
     
-    //Баланс контракта
     function balanceOfContract() public view returns(uint){
         return address(this).balance;
     }
     
-    //Время жизни пирамиды
     function timeOfContract() public view returns(uint){
         uint _time = now.sub(timeOfLife);
         return _time.div(PERIOD);
