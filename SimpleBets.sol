@@ -1,18 +1,20 @@
 pragma solidity ^0.5.4;
 
-/*Суть такова: Человек создаёт контракт для ставок. Он назначается владельцем контракта.
+/*The point is that a person creates a contract to make a bet. He becomes the owner of that contract. 
 
-Он и только он может добавлять «события в контракт с помощью метода createEvent где надо ввести название события. 
-В этом методе также добавляется уникальное  ID для удобного взаимодействия с событием. 
+He is the only person who is able to add events to the contract using createEvent method where the name of a certain event is entered. The method also comes with unique ID to make an interaction with an event more convenient. 
 
-После создания события на него можно делать ставки.  Либо победа, либо поражение 50/50. Для простоты расчётов ставить можно только 1 эфир. 
+After creating an event, you can make a bet. Ether winning or losing (50/50). To make calculations easier only 1 Ether can be bet. 
 
-Далее только владелец контракта может вызвать метод setResult для расчёта результата.
-Однако идёт проверка, есть ли ставки на хоть какой-нибудь результат. 
-Если проверка прошла, больше ставки делать нельзя. 
-Для вычисления результата используется ПВСЕВДО случайная функция 50 на 50. Результат задаётся игре.
+After this, the contract’s owner only is able to use setResult method to calculate the result. 
 
-Потом игроки могут проверить результат события(игры) и если они угадали, могу вывести то, что они выиграли. */
+However there is a checking, whether bets on any result are made or not. 
+
+If the check is successful, no more bets can be made. 
+
+To calculate the result pseudo-function 50/50 is used by chance. The result is set in the game. 
+
+Then the players can check the result of the event (game). And, if their guesses are right, they can withdraw the winnings to their  accounts. */
 
 
 contract MyBets {
